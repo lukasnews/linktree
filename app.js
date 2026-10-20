@@ -58,6 +58,21 @@ const platformsLabel = (a) => {
   return parts.length ? parts.join(" · ") + " – Tester werden" : "Bald verfügbar";
 };
 
+// Nur-Symbol-Knopf, der eine URL kopiert und kurz einen Haken zeigt
+const COPY_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const CHECK_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+function copyButton(url) {
+  const btn = el("button", { type: "button", class: "copy", "aria-label": "Link kopieren", title: "Link kopieren" });
+  btn.innerHTML = COPY_SVG;
+  btn.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(url); }
+    catch { prompt("Link kopieren:", url); return; }
+    btn.innerHTML = CHECK_SVG; btn.classList.add("copied");
+    setTimeout(() => { btn.innerHTML = COPY_SVG; btn.classList.remove("copied"); }, 1500);
+  });
+  return btn;
+}
+
 const insertAt = (list, item, pos) => {
   const out = [...list];
   out.splice(Number.isInteger(pos) ? Math.min(Math.max(pos, 0), out.length) : out.length, 0, item);
@@ -71,12 +86,14 @@ function renderHome() {
     el("section", {},
       s.title ? el("h2", {}, s.title) : null,
       el("div", { class: "list" }, (s.links || []).map((l) =>
-        el("a", { class: "item", href: l.url, target: "_blank", rel: "noopener" },
-          icon(l.icon),
-          el("span", { class: "item-text" },
-            el("span", { class: "item-title" }, l.title),
-            l.description ? el("span", { class: "item-desc" }, l.description) : null),
-          el("span", { class: "chev", "aria-hidden": "true" }, "↗"))))));
+        el("div", { class: "item split" },
+          el("a", { class: "item-main", href: l.url, target: "_blank", rel: "noopener" },
+            icon(l.icon),
+            el("span", { class: "item-text" },
+              el("span", { class: "item-title" }, l.title),
+              l.description ? el("span", { class: "item-desc" }, l.description) : null),
+            el("span", { class: "chev", "aria-hidden": "true" }, "↗")),
+          copyButton(l.url))))));
 
   const apps = (data.apps || []).length
     ? el("section", {},
