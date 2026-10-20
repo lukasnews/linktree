@@ -135,6 +135,26 @@ function stepsFor(app, p) {
   ];
 }
 
+// Teilen-Menü des Handys öffnen, sonst Link in die Zwischenablage kopieren
+function shareButton(app) {
+  const url = `${location.origin}${location.pathname}#/app/${encodeURIComponent(app.id)}`;
+  const btn = el("button", { type: "button", class: "share", "aria-label": "Link teilen" }, "Teilen");
+  btn.addEventListener("click", async () => {
+    if (navigator.share) {
+      try { await navigator.share({ title: app.name, text: `${app.name} testen`, url }); } catch {}
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      btn.textContent = "Link kopiert ✓";
+    } catch {
+      prompt("Link kopieren:", url);
+    }
+    setTimeout(() => { btn.textContent = "Teilen"; }, 2000);
+  });
+  return btn;
+}
+
 function renderApp(id) {
   const app = (data.apps || []).find((a) => a.id === id);
   if (!app) { location.hash = ""; return; }
@@ -178,7 +198,7 @@ function renderApp(id) {
 
   show(
     el("a", { class: "back", href: "#" }, "← Zurück"),
-    el("div", { class: "app-head" }, icon(app.icon), el("h1", {}, app.name)),
+    el("div", { class: "app-head" }, icon(app.icon), el("h1", {}, app.name), shareButton(app)),
     app.description ? el("p", { class: "app-desc" }, app.description) : el("div", { style: "height:16px" }),
     missing,
     available.length > 1 ? toggle : null,
