@@ -209,6 +209,8 @@ function renderApp(id) {
 
 let loadError = null;
 function route() {
+  // Leeres "#" aus der Adresszeile entfernen (z. B. nach „← Zurück“)
+  if (location.href.endsWith("#")) history.replaceState(null, "", location.pathname + location.search);
   if (location.hash.startsWith("#/admin")) return window.Admin.render();
   if (loadError) return show(el("p", { class: "muted center" }, `links.json konnte nicht geladen werden (${loadError}).`));
   if (!data) return;
