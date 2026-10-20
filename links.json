@@ -29,13 +29,27 @@
       "description": "Hilf mit, die App vor dem Release zu testen.",
       "icon": "📱",
       "android": {
+        "mode": "play",
         "groupName": "beispiel-app-tester",
         "groupUrl": "https://groups.google.com/g/beispiel-app-tester",
         "testerUrl": "https://play.google.com/apps/testing/com.example.app",
         "storeUrl": "https://play.google.com/store/apps/details?id=com.example.app"
       },
       "ios": {
-        "testflightUrl": "https://testflight.apple.com/join/XXXXXXXX"
+        "mode": "web",
+        "url": "https://example.com/app"
+      }
+    },
+    {
+      "id": "nur-android",
+      "name": "Nur-Android-App",
+      "icon": "🤖",
+      "description": "Gibt es nur für Android.",
+      "android": {
+        "mode": "play",
+        "groupUrl": "https://groups.google.com/g/x",
+        "testerUrl": "https://play.google.com/apps/testing/x",
+        "storeUrl": "https://play.google.com/store/apps/details?id=x"
       }
     }
   ]
