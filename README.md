@@ -23,13 +23,19 @@ Pro App einstellbar:
 
 Die Plattform wird anhand des Geräts vorausgewählt. Jede App hat einen teilbaren Link: `…/#/app/<id>`.
 
-## Eigene Domain (chaoten.online)
+## Eigene Domain: links.chaoten.online
 
 1. GitHub → Repo → Settings → Pages → *Source*: **GitHub Actions**.
-2. Unter *Custom domain* die Domain eintragen, danach **Enforce HTTPS** aktivieren.
-3. Beim Domain-Anbieter DNS setzen:
-   - Subdomain (z. B. `links.chaoten.online`): `CNAME` → `lukasnews.github.io`
-   - Hauptdomain `chaoten.online`: `A`-Einträge `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+2. Unter *Custom domain* `links.chaoten.online` eintragen und speichern.
+3. Beim Domain-Anbieter für `chaoten.online` einen DNS-Eintrag anlegen:
+
+   | Typ   | Name    | Wert                   |
+   |-------|---------|------------------------|
+   | CNAME | `links` | `lukasnews.github.io.` |
+
+4. Warten, bis GitHub „DNS check successful“ meldet (Minuten bis wenige Stunden), dann **Enforce HTTPS** aktivieren.
+
+Die Datei `CNAME` im Repo hält die Domain zusätzlich fest.
 
 ## Lokal ansehen
 
