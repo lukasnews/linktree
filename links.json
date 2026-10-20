@@ -1,0 +1,42 @@
+{
+  "profile": {
+    "name": "Lukas",
+    "bio": "Meine Webseiten & Apps an einem Ort",
+    "avatar": "assets/avatar.svg"
+  },
+  "sections": [
+    {
+      "title": "Webseiten",
+      "links": [
+        {
+          "title": "Mein Blog",
+          "description": "Gedanken, Projekte, Notizen",
+          "url": "https://example.com",
+          "icon": "📝"
+        },
+        {
+          "title": "Portfolio",
+          "url": "https://example.org",
+          "icon": "🎨"
+        }
+      ]
+    }
+  ],
+  "apps": [
+    {
+      "id": "beispiel-app",
+      "name": "Beispiel App",
+      "description": "Hilf mit, die App vor dem Release zu testen.",
+      "icon": "📱",
+      "android": {
+        "groupName": "beispiel-app-tester",
+        "groupUrl": "https://groups.google.com/g/beispiel-app-tester",
+        "testerUrl": "https://play.google.com/apps/testing/com.example.app",
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.example.app"
+      },
+      "ios": {
+        "testflightUrl": "https://testflight.apple.com/join/XXXXXXXX"
+      }
+    }
+  ]
+}
