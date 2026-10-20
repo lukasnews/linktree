@@ -25,7 +25,7 @@ Die Plattform wird anhand des Geräts vorausgewählt. Jede App hat einen teilbar
 
 ## Eigene Domain: links.chaoten.online
 
-1. GitHub → Repo → Settings → Pages → *Source*: **GitHub Actions**.
+1. GitHub → Repo → Settings → Pages → *Source*: **Deploy from a branch**, Branch `main`, Ordner `/ (root)`.
 2. Unter *Custom domain* `links.chaoten.online` eintragen und speichern.
 3. Beim Domain-Anbieter für `chaoten.online` einen DNS-Eintrag anlegen:
 
