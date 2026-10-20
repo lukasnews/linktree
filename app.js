@@ -85,10 +85,13 @@ function renderHome() {
     : null;
 
   show(
-    el("header", { class: "profile" },
-      p.avatar ? el("img", { src: p.avatar, alt: "" }) : null,
-      el("h1", {}, p.name || ""),
-      p.bio ? el("p", {}, p.bio) : null),
+    // Überschrift nur zeigen, wenn mindestens ein Feld ausgefüllt ist
+    p.name || p.bio || p.avatar
+      ? el("header", { class: "profile" },
+          p.avatar ? el("img", { src: p.avatar, alt: "" }) : null,
+          p.name ? el("h1", {}, p.name) : null,
+          p.bio ? el("p", {}, p.bio) : null)
+      : null,
     ...sections,
     apps,
     el("footer", {},
