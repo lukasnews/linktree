@@ -114,6 +114,7 @@ window.Admin = (() => {
       return app;
     });
     for (const k of ["appsTitle", "footer"]) if (!out[k]) delete out[k];
+    if (!(out.appsPosition < out.sections.length)) delete out.appsPosition;
     return out;
   }
 
@@ -136,6 +137,19 @@ window.Admin = (() => {
     }
     return [...new Set(errors)];
   }
+
+  // Reihenfolge der Blöcke: Link-Abschnitte plus der Apps-Block an Position appsPosition
+  const APPS = { apps: true };
+  const blockOrder = (d) => {
+    const order = [...d.sections];
+    const pos = Number.isInteger(d.appsPosition) ? Math.min(Math.max(d.appsPosition, 0), order.length) : order.length;
+    order.splice(pos, 0, APPS);
+    return order;
+  };
+  const setBlockOrder = (d, order) => {
+    d.appsPosition = order.indexOf(APPS);
+    d.sections = order.filter((b) => b !== APPS);
+  };
 
   const setMsg = (text, type = "ok") => { msg = text ? { text, type } : null; };
   const markDirty = () => {
@@ -168,7 +182,7 @@ window.Admin = (() => {
     el("button", { type: "button", class: "ghost", disabled: i === arr.length - 1, "aria-label": "Nach unten",
       onclick: () => { [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]]; markDirty(); draw(); } }, "↓"),
     el("button", { type: "button", class: "ghost danger", "aria-label": "Löschen",
-      onclick: () => { if (confirm("Wirklich löschen?")) { arr.splice(i, 1); markDirty(); draw(); } } }, "Löschen"));
+      onclick: () => { if (confirm("Diesen Eintrag löschen?")) { arr.splice(i, 1); markDirty(); draw(); } } }, "Eintrag löschen"));
 
   const card = (obj, summary, body) => {
     const d = el("details", { class: "edit-card", open: openSet.has(obj),
@@ -177,6 +191,11 @@ window.Admin = (() => {
     return d;
   };
 
+  // Emoji oder kleines Bild vor dem Namen im Kartenkopf
+  const summaryIcon = (v) => !v ? null
+    : /[./]/.test(v) ? el("img", { class: "summary-icon", src: v, alt: "" })
+    : el("span", { class: "summary-icon" }, v);
+
   const liveTitle = (fallback) => {
     const span = el("span", {}, fallback);
     return [span, (v) => { span.textContent = v || "Ohne Namen"; }];
@@ -184,7 +203,7 @@ window.Admin = (() => {
 
   function linkEditor(links, l, i) {
     const [title, update] = liveTitle(l.title || "Neuer Link");
-    return card(l, [l.icon ? `${l.icon} ` : "", title], [
+    return card(l, [summaryIcon(l.icon), title], [
       field("Name", l, "title", { onInput: update }),
       field("URL", l, "url", { type: "url", placeholder: "https://…" }),
       field("Beschreibung (optional)", l, "description"),
@@ -211,7 +230,7 @@ window.Admin = (() => {
   function appEditor(app, i) {
     const [title, update] = liveTitle(app.name || "Neue App");
     const modeSelect = (p, label, opts) => select(label, app[p].mode, opts, (v) => { app[p].mode = v; markDirty(); draw(); });
-    return card(app, [app.icon ? `${app.icon} ` : "", title], [
+    return card(app, [summaryIcon(app.icon), title], [
       field("Name", app, "name", { onInput: update }),
       field("Beschreibung (optional)", app, "description"),
       field("Icon (Emoji oder Bild-URL)", app, "icon"),
@@ -378,30 +397,44 @@ window.Admin = (() => {
         field("Untertitel", d.profile, "bio"),
         field("Profilbild (URL)", d.profile, "avatar", { placeholder: "assets/avatar.svg" }))),
 
-      d.sections.map((sec, si) => el("section", {},
-        el("div", { class: "section-head" },
-          el("input", { class: "section-title", value: sec.title || "", placeholder: "Abschnitt",
-            oninput: (e) => { sec.title = e.target.value; markDirty(); } }),
-          el("button", { type: "button", class: "ghost danger", onclick: () => {
-            if (confirm(`Abschnitt „${sec.title || ""}“ mit allen Links löschen?`)) { d.sections.splice(si, 1); markDirty(); draw(); }
-          } }, "Löschen")),
-        el("div", { class: "list" }, sec.links.map((l, i) => linkEditor(sec.links, l, i))),
-        el("button", { type: "button", class: "add", onclick: () => {
-          const l = { title: "", url: "", icon: "🔗" }; sec.links.push(l); openSet.add(l); markDirty(); draw();
-        } }, "+ Link"))),
-      el("button", { type: "button", class: "add", onclick: () => {
-        d.sections.push({ title: "Neuer Abschnitt", links: [] }); markDirty(); draw();
-      } }, "+ Abschnitt"),
+      blockOrder(d).map((b, bi, order) => {
+        const move = (dir) => el("button", {
+          type: "button", class: "ghost", disabled: bi + dir < 0 || bi + dir >= order.length,
+          "aria-label": dir < 0 ? "Abschnitt nach oben" : "Abschnitt nach unten",
+          onclick: () => { [order[bi], order[bi + dir]] = [order[bi + dir], order[bi]]; setBlockOrder(d, order); markDirty(); draw(); },
+        }, dir < 0 ? "↑" : "↓");
 
-      el("section", {},
-        el("div", { class: "section-head" },
-          el("input", { class: "section-title", value: d.appsTitle || "", placeholder: "Testapps",
-            oninput: (e) => { d.appsTitle = e.target.value; markDirty(); } })),
-        el("div", { class: "list" }, d.apps.map((a, i) => appEditor(a, i))),
-        el("button", { type: "button", class: "add", onclick: () => {
-          const a = { id: "", name: "", icon: "📱", android: { mode: "play" }, ios: { mode: "web" } };
-          d.apps.push(a); openSet.add(a); markDirty(); draw();
-        } }, "+ App")),
+        if (b === APPS) return el("section", {},
+          el("div", { class: "section-head" },
+            el("input", { class: "section-title", value: d.appsTitle || "", placeholder: "Testapps",
+              oninput: (e) => { d.appsTitle = e.target.value; markDirty(); } }),
+            move(-1), move(1)),
+          el("div", { class: "list" }, d.apps.map((a, i) => appEditor(a, i))),
+          el("button", { type: "button", class: "add", onclick: () => {
+            const a = { id: "", name: "", icon: "📱", android: { mode: "play" }, ios: { mode: "web" } };
+            d.apps.push(a); openSet.add(a); markDirty(); draw();
+          } }, "+ App"));
+
+        const sec = b;
+        return el("section", {},
+          el("div", { class: "section-head" },
+            el("input", { class: "section-title", value: sec.title || "", placeholder: "Abschnitt",
+              oninput: (e) => { sec.title = e.target.value; markDirty(); } }),
+            move(-1), move(1),
+            el("button", { type: "button", class: "ghost danger", "aria-label": "Abschnitt löschen", title: "Abschnitt löschen", onclick: () => {
+              if (confirm(`Abschnitt „${sec.title || ""}“ mit allen Links löschen?`)) {
+                d.sections.splice(d.sections.indexOf(sec), 1); setBlockOrder(d, blockOrder(d)); markDirty(); draw();
+              }
+            } }, "🗑")),
+          el("div", { class: "list" }, sec.links.map((l, i) => linkEditor(sec.links, l, i))),
+          el("button", { type: "button", class: "add", onclick: () => {
+            const l = { title: "", url: "", icon: "🔗" }; sec.links.push(l); openSet.add(l); markDirty(); draw();
+          } }, "+ Link"));
+      }),
+      el("button", { type: "button", class: "add", onclick: () => {
+        const order = blockOrder(d); order.push({ title: "Neuer Abschnitt", links: [] });
+        setBlockOrder(d, order); markDirty(); draw();
+      } }, "+ Abschnitt"),
 
       el("h2", {}, "Fußzeile"),
       el("div", { class: "edit-card plain" }, el("div", { class: "edit-body" },

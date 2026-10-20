@@ -58,6 +58,12 @@ const platformsLabel = (a) => {
   return parts.length ? parts.join(" · ") + " – Tester werden" : "Bald verfügbar";
 };
 
+const insertAt = (list, item, pos) => {
+  const out = [...list];
+  out.splice(Number.isInteger(pos) ? Math.min(Math.max(pos, 0), out.length) : out.length, 0, item);
+  return out;
+};
+
 function renderHome() {
   const p = data.profile || {};
   document.title = p.name || "Links";
@@ -92,8 +98,7 @@ function renderHome() {
           p.name ? el("h1", {}, p.name) : null,
           p.bio ? el("p", {}, p.bio) : null)
       : null,
-    ...sections,
-    apps,
+    ...insertAt(sections, apps, data.appsPosition),
     el("footer", {},
       data.footer ? el("div", {}, data.footer) : null,
       el("a", { class: "admin-link", href: "#/admin", "aria-label": "Bearbeiten" }, "🔒")));
