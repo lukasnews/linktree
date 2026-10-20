@@ -1,9 +1,5 @@
 {
-  "profile": {
-    "name": "Lukas",
-    "bio": "Meine Webseiten & Apps an einem Ort",
-    "avatar": "assets/avatar.svg"
-  },
+  "profile": {},
   "sections": [
     {
       "title": "Webseiten",
