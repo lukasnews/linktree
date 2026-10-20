@@ -372,6 +372,7 @@ window.Admin = (() => {
       message(),
 
       el("h2", {}, "Profil"),
+      el("p", { class: "muted small" }, "Alle Felder leer lassen, um die Überschrift auszublenden."),
       el("div", { class: "edit-card plain" }, el("div", { class: "edit-body" },
         field("Name", d.profile, "name"),
         field("Untertitel", d.profile, "bio"),
