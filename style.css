@@ -160,3 +160,6 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1
   border: 1px solid var(--line); background: var(--card); color: var(--text);
 }
 .share:hover { border-color: var(--muted); }
+
+.summary-icon { display: inline-block; width: 22px; height: 22px; margin-right: 8px; vertical-align: -5px; border-radius: 5px; object-fit: cover; text-align: center; }
+.section-head .ghost { flex: none; }
