@@ -43,11 +43,6 @@
         "testerUrl": "https://play.google.com/apps/testing/com.javunolabs.kavo",
         "storeUrl": "https://play.google.com/store/apps/details?id=com.javunolabs.kavo"
       }
-    },
-    {
-      "id": "tst",
-      "name": "Tst",
-      "icon": "🔫q1"
     }
   ],
   "appsTitle": "Apps"
