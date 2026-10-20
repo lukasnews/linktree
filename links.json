@@ -22,7 +22,7 @@
       "id": "wuno",
       "name": "WUNO",
       "description": "Hilf mit, die App vor dem Release zu testen.",
-      "icon": "📱",
+      "icon": "assets/play-icon-512.png",
       "android": {
         "mode": "play",
         "groupName": "wuno-tester",
@@ -38,7 +38,7 @@
     {
       "id": "nur-android",
       "name": "Kavo",
-      "icon": "🤖",
+      "icon": "assets/web-icon.jpg",
       "description": "Gibt es nur für Android.",
       "android": {
         "mode": "play",
