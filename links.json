@@ -35,7 +35,7 @@
       "id": "kavo",
       "name": "Kavo",
       "icon": "assets/web-icon.jpg",
-      "description": "Gibt es nur für Android.",
+      "description": "Gibt es nur für Android. (kostenpflichtig)",
       "android": {
         "mode": "play",
         "groupName": "kavo-tester",
