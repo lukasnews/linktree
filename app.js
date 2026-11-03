@@ -43,7 +43,9 @@ const store = {
 //   android: "play" (Google-Gruppe + Play-Test) | "web" | "none"
 //   ios:     "testflight" | "web" | "none"
 const DEFAULT_MODE = { android: "play", ios: "testflight" };
-const MODE_LABEL = { play: "", testflight: "", web: " (Web)" };
+const MODE_LABEL = { play: "", testflight: "", store: "", appstore: "", web: " (Web)" };
+const TEST_MODES = ["play", "testflight"];
+const isTesting = (a) => ["android", "ios"].some((p) => TEST_MODES.includes(platform(a, p)?.mode));
 function platform(app, p) {
   const cfg = app[p];
   if (!cfg) return null;
@@ -55,7 +57,9 @@ const platformsLabel = (a) => {
   const parts = ["android", "ios"]
     .map((p) => { const c = platform(a, p); return c && (p === "android" ? "Android" : "iOS") + MODE_LABEL[c.mode]; })
     .filter(Boolean);
-  return parts.length ? parts.join(" · ") + " – Tester werden" : "Bald verfügbar";
+  if (!parts.length) return "Bald verfügbar";
+  const live = ["android", "ios"].some((p) => ["store", "appstore"].includes(platform(a, p)?.mode));
+  return parts.join(" · ") + (isTesting(a) ? " – Tester werden" : live ? " – Jetzt laden" : "");
 };
 
 // Nur-Symbol-Knopf, der eine URL kopiert und kurz einen Haken zeigt
@@ -129,6 +133,10 @@ const webSteps = (url, browser, how) => [
 
 function stepsFor(app, p) {
   const c = platform(app, p);
+  if (c.mode === "store")
+    return [{ title: "Im Play Store laden", text: "Installiere die App aus dem Google Play Store.", url: c.storeUrl, button: "Zum Play Store" }];
+  if (c.mode === "appstore")
+    return [{ title: "Im App Store laden", text: "Installiere die App aus dem Apple App Store.", url: c.appStoreUrl, button: "Zum App Store" }];
   if (p === "android" && c.mode === "web")
     return webSteps(c.url, "Chrome", "Tippe oben rechts auf ⋮ und dann auf „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.");
   if (p === "ios" && c.mode === "web")
@@ -163,7 +171,7 @@ function shareButton(app) {
   const btn = el("button", { type: "button", class: "share", "aria-label": "Link teilen" }, "Teilen");
   btn.addEventListener("click", async () => {
     if (navigator.share) {
-      try { await navigator.share({ title: app.name, text: `${app.name} testen`, url }); } catch {}
+      try { await navigator.share({ title: app.name, text: isTesting(app) ? `${app.name} testen` : app.name, url }); } catch {}
       return;
     }
     try {
@@ -180,7 +188,7 @@ function shareButton(app) {
 function renderApp(id) {
   const app = (data.apps || []).find((a) => a.id === id);
   if (!app) { location.hash = ""; return; }
-  document.title = `${app.name} testen`;
+  document.title = isTesting(app) ? `${app.name} testen` : app.name;
 
   const available = ["android", "ios"].filter((p) => platform(app, p));
   const device = detectPlatform();
@@ -190,6 +198,7 @@ function renderApp(id) {
 
   const toggle = el("div", { class: "toggle", role: "group", "aria-label": "Plattform wählen" });
   const list = el("ol", { class: "steps" });
+  const hint = el("p", { class: "hint" }, "Erledigte Schritte werden auf diesem Gerät gemerkt.");
 
   const draw = () => {
     toggle.replaceChildren(...available.map((p) =>
@@ -200,9 +209,12 @@ function renderApp(id) {
       }, name(p) + MODE_LABEL[platform(app, p).mode])));
 
     const done = new Set(store.get(doneKey(current)) || []);
-    list.replaceChildren(...stepsFor(app, current).map((s, i) =>
-      el("li", { class: "step" + (done.has(i) ? " done" : "") },
-        el("span", { class: "num" }, done.has(i) ? "✓" : String(i + 1)),
+    const steps = stepsFor(app, current);
+    const single = steps.length === 1;
+    hint.hidden = single;
+    list.replaceChildren(...steps.map((s, i) =>
+      el("li", { class: "step" + (single ? " single" : done.has(i) ? " done" : "") },
+        single ? null : el("span", { class: "num" }, done.has(i) ? "✓" : String(i + 1)),
         el("div", {},
           el("h3", {}, s.title),
           el("p", {}, s.text),
@@ -225,7 +237,7 @@ function renderApp(id) {
     missing,
     available.length > 1 ? toggle : null,
     current ? list : el("p", { class: "muted" }, "Noch keine Testversion verfügbar."),
-    current ? el("p", { class: "hint" }, "Erledigte Schritte werden auf diesem Gerät gemerkt.") : null);
+    current ? hint : null);
   window.scrollTo(0, 0);
 }
 

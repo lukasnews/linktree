@@ -179,3 +179,6 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1
 }
 .copy:hover { color: var(--text); }
 .copy.copied { color: var(--done); }
+
+/* Einzelner Schritt (z. B. veröffentlichte App) ohne Nummer */
+.step.single { grid-template-columns: 1fr; }
