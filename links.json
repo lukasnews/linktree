@@ -27,8 +27,8 @@
         "storeUrl": "https://play.google.com/store/apps/details?id=com.javuno.giftkeep"
       },
       "ios": {
-        "mode": "web",
-        "url": "https://wishapp-five.vercel.app"
+        "mode": "appstore",
+        "appStoreUrl": "https://apps.apple.com/at/app/id6826515225"
       }
     },
     {
