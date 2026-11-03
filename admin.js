@@ -108,7 +108,7 @@ window.Admin = (() => {
       const app = strip(a);
       for (const p of ["android", "ios"]) {
         if (!a[p] || a[p].mode === "none") { delete app[p]; continue; }
-        const keep = { play: ["groupName", "groupUrl", "testerUrl", "storeUrl"], testflight: ["testflightUrl"], web: ["url"] }[a[p].mode];
+        const keep = { play: ["groupName", "groupUrl", "testerUrl", "storeUrl"], testflight: ["testflightUrl"], store: ["storeUrl"], appstore: ["appStoreUrl"], web: ["url"] }[a[p].mode];
         app[p] = strip({ mode: a[p].mode, ...Object.fromEntries(keep.map((k) => [k, a[p][k]])) });
       }
       return app;
@@ -130,7 +130,7 @@ window.Admin = (() => {
       a.id = slug(a.id || a.name);
       if (ids.has(a.id)) errors.push(`App-ID „${a.id}“ kommt doppelt vor.`);
       ids.add(a.id);
-      const need = { play: ["groupUrl", "testerUrl", "storeUrl"], testflight: ["testflightUrl"], web: ["url"], none: [] };
+      const need = { play: ["groupUrl", "testerUrl", "storeUrl"], testflight: ["testflightUrl"], store: ["storeUrl"], appstore: ["appStoreUrl"], web: ["url"], none: [] };
       for (const p of ["android", "ios"])
         for (const k of need[a[p].mode])
           if (!a[p][k]) errors.push(`${a.name || "App"}: ${p === "android" ? "Android" : "iOS"} – Link fehlt.`);
@@ -223,6 +223,12 @@ window.Admin = (() => {
     if (c.mode === "testflight") return [
       field("TestFlight-Einladungslink", c, "testflightUrl", { type: "url", placeholder: "https://testflight.apple.com/join/…" }),
     ];
+    if (c.mode === "store") return [
+      field("Play-Store-Link", c, "storeUrl", { type: "url", placeholder: "https://play.google.com/store/apps/details?id=…" }),
+    ];
+    if (c.mode === "appstore") return [
+      field("App-Store-Link", c, "appStoreUrl", { type: "url", placeholder: "https://apps.apple.com/app/…" }),
+    ];
     if (c.mode === "web") return [field("Web-App-URL", c, "url", { type: "url", placeholder: "https://…" })];
     return [];
   }
@@ -236,10 +242,10 @@ window.Admin = (() => {
       field("Icon (Emoji oder Bild-URL)", app, "icon"),
       field("Kurz-ID für den Link (optional)", app, "id", { placeholder: slug(app.name) || "meine-app" }),
       el("div", { class: "platform" },
-        modeSelect("android", "Android", [["play", "Play-Test (Gruppe → Tester → Store)"], ["web", "Web-App"], ["none", "Kein Android"]]),
+        modeSelect("android", "Android", [["store", "Play Store (veröffentlicht)"], ["play", "Play-Test (Gruppe → Tester → Store)"], ["web", "Web-App"], ["none", "Kein Android"]]),
         platformFields(app, "android")),
       el("div", { class: "platform" },
-        modeSelect("ios", "iOS", [["testflight", "TestFlight"], ["web", "Web-App"], ["none", "Kein iOS"]]),
+        modeSelect("ios", "iOS", [["appstore", "App Store (veröffentlicht)"], ["testflight", "TestFlight"], ["web", "Web-App"], ["none", "Kein iOS"]]),
         platformFields(app, "ios")),
       moveBtns(s.data.apps, i),
     ]);
