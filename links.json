@@ -43,6 +43,19 @@
         "testerUrl": "https://play.google.com/apps/testing/com.javunolabs.kavo",
         "storeUrl": "https://play.google.com/store/apps/details?id=com.javunolabs.kavo"
       }
+    },
+    {
+      "id": "baco",
+      "name": "BaCo",
+      "icon": "assets/baco.jpg",
+      "android": {
+        "mode": "play",
+        "groupName": "baco-tester",
+        "groupUrl": "https://groups.google.com/g/baco-tester",
+        "testerUrl": "https://play.google.com/apps/testing/com.javuno.baco",
+        "storeUrl": "https://play.google.com/store/apps/details?id=com.javuno.baco"
+      },
+      "description": "Nur Android"
     }
   ],
   "appsTitle": "Apps"
