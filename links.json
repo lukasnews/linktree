@@ -47,7 +47,7 @@
     {
       "id": "baco",
       "name": "BaCo",
-      "icon": "assets/baco.jpg",
+      "icon": "assets/baco.png",
       "android": {
         "mode": "play",
         "groupName": "baco-tester",
